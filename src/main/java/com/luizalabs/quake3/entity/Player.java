@@ -14,6 +14,10 @@ public class Player implements Serializable {
     private Long id;
     private String nickname;
 
+    public Player(String nickname){
+        this.nickname = nickname;
+    }
+
     public Long getId() {
         return id;
     }

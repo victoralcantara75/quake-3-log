@@ -1,6 +1,8 @@
 package com.luizalabs.quake3.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
 
@@ -8,10 +10,17 @@ import java.io.Serializable;
 public class PlayerGame implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Long playerId;
     private Long gameId;
     private Integer kills;
+
+    public PlayerGame(Long playerId, Long gameId){
+        this.playerId = playerId;
+        this.gameId = gameId;
+        this.kills = 0;
+    }
 
     public Long getId() {
         return id;
