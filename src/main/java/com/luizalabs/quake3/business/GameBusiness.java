@@ -1,17 +1,18 @@
 package com.luizalabs.quake3.business;
 
+import com.luizalabs.quake3.DTO.GameDTO;
+import com.luizalabs.quake3.DTO.PlayerKillsByGame;
 import com.luizalabs.quake3.entity.Game;
 import com.luizalabs.quake3.entity.Player;
 import com.luizalabs.quake3.entity.PlayerGame;
 import com.luizalabs.quake3.enums.GameActionEnum;
 import com.luizalabs.quake3.repository.GameRepository;
-import com.luizalabs.quake3.util.ReadFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GameBusiness {
@@ -27,7 +28,7 @@ public class GameBusiness {
         return gameRepository.saveAndFlush(game);
     }
 
-    private void playerAction(String line, Game game){
+    public void playerAction(String line, Game game){
         String nickname = playerBusiness.getPlayerName(line);
         Player player = playerBusiness.findPlayerByName(nickname);
         PlayerGame playerGame;
@@ -35,17 +36,17 @@ public class GameBusiness {
         if (player == null){
             player = new Player(nickname);
             playerBusiness.createPlayer(player);
-            playerGame = new PlayerGame(player.getId(), game.getId());
         }
         else{
             playerGame = playerGameBusiness.findByPlayerIdAndGameId(player.getId(), game.getId());
-            if (playerGame == null) playerGame = new PlayerGame(player.getId(), game.getId());
+            if (playerGame != null) return;
         }
 
+        playerGame = new PlayerGame(player.getId(), game.getId());
         playerGameBusiness.salvar(playerGame);
     }
 
-    private void killAction(List<String> splitLine, Game game){
+    public void killAction(List<String> splitLine, Game game){
         String killer = splitLine.get(5);
         String killed = splitLine.get(7);
         PlayerGame playerGame;
@@ -73,27 +74,41 @@ public class GameBusiness {
 
     }
 
-    public void newGame(BufferedReader bufferedReader) throws IOException {
+    public Game newGame(){
 
         Game game = new Game();
         this.salvar(game);
-        String line;
+        return game;
 
-        while((line = bufferedReader.readLine()) != null){
+    }
 
-            List<String> splitLine = ReadFileUtil.getSplitLine(line);
+    public List<GameDTO> getGamesResume(){
 
-            if(splitLine.get(1).equals(GameActionEnum.NEW_PLAYER.getValue())){
-                playerAction(line, game);
-            }
-            else if (splitLine.get(1).equals(GameActionEnum.KILL.getValue())){
-                killAction(splitLine, game);
-            }
-            else if(splitLine.get(1).equals(GameActionEnum.END_GAME.getValue())){
-                break;
-            }
+        List<GameDTO> gameDtoList = new ArrayList<>();
+        List<Game> gameList = gameRepository.findAll();
+
+        for (Game game : gameList){
+
+            GameDTO gameDTO = new GameDTO();
+            gameDTO.setTotal_kills(game.getTotalKills());
+
+            List<PlayerGame> playerGames = playerGameBusiness.findByGameId(game.getId());
+
+            List<Long> playersIds = playerGames.stream().map(PlayerGame::getPlayerId).collect(Collectors.toList());
+            List<Player> players = playerBusiness.getPlayerByIdIn(playersIds);
+            List<String> playersNicknames = players.stream().map(Player::getNickname).collect(Collectors.toList());
+            gameDTO.setPlayers(playersNicknames);
+
+            List<PlayerKillsByGame> playerKillsByGame = getPlayersKillByGame(game.getId());
+            gameDTO.setKills(playerKillsByGame);
+            gameDtoList.add(gameDTO);
         }
 
+        return gameDtoList;
+    }
+
+    private List<PlayerKillsByGame> getPlayersKillByGame(Long gameId){
+        return gameRepository.findPlayersKillByGame(gameId);
     }
 
 }

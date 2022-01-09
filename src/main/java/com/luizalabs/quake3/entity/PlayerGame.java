@@ -16,6 +16,8 @@ public class PlayerGame implements Serializable {
     private Long gameId;
     private Integer kills;
 
+    public PlayerGame(){}
+
     public PlayerGame(Long playerId, Long gameId){
         this.playerId = playerId;
         this.gameId = gameId;

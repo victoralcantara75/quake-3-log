@@ -1,5 +1,6 @@
 package com.luizalabs.quake3.business;
 
+import com.luizalabs.quake3.entity.Game;
 import com.luizalabs.quake3.enums.GameActionEnum;
 import com.luizalabs.quake3.util.ReadFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,20 +20,21 @@ public class FileBusiness {
     public void readFile(MultipartFile file) throws IOException {
         BufferedReader bufferedReader = ReadFileUtil.getFileReader(file);
         String line;
+        Game game = null;
 
         while( (line = bufferedReader.readLine()) != null){
 
             List<String> splitLine = ReadFileUtil.getSplitLine(line);
             if (splitLine.get(1).equals(GameActionEnum.START_GAME.getValue())){
-                try{
-                    gameBusiness.newGame(bufferedReader);
-                }catch (Exception e){
-                    System.out.println(e);
-                }
-
+                game = gameBusiness.newGame();
+            }
+            else if(splitLine.get(1).equals(GameActionEnum.NEW_PLAYER.getValue()) && game != null){
+                gameBusiness.playerAction(line, game);
+            }
+            else if (splitLine.get(1).equals(GameActionEnum.KILL.getValue()) && game != null){
+                gameBusiness.killAction(splitLine, game);
             }
         }
-
     }
 
 

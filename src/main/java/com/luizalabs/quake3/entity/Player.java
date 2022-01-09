@@ -14,6 +14,8 @@ public class Player implements Serializable {
     private Long id;
     private String nickname;
 
+    public Player(){}
+
     public Player(String nickname){
         this.nickname = nickname;
     }

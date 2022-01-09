@@ -5,6 +5,8 @@ import com.luizalabs.quake3.repository.PlayerGameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PlayerGameBusiness {
 
@@ -17,6 +19,10 @@ public class PlayerGameBusiness {
 
     public PlayerGame findByPlayerIdAndGameId(Long playerId, Long gameId){
         return playerGameRepository.findByPlayerIdAndGameId(playerId, gameId);
+    }
+
+    public List<PlayerGame> findByGameId(Long gameId){
+        return playerGameRepository.findByGameId(gameId);
     }
 
 }
