@@ -5,7 +5,6 @@ public enum GameActionEnum {
     START_GAME("InitGame:"),
     NEW_PLAYER("ClientUserinfoChanged:"),
     KILL("Kill:"),
-    END_GAME("ShutdownGame:"),
     WORLD("<world>");
 
 

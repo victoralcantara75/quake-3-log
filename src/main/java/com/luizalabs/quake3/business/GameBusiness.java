@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,26 +89,44 @@ public class GameBusiness {
         List<Game> gameList = gameRepository.findAll();
 
         for (Game game : gameList){
-
-            GameDTO gameDTO = new GameDTO();
-            gameDTO.setTotal_kills(game.getTotalKills());
-
-            List<PlayerGame> playerGames = playerGameBusiness.findByGameId(game.getId());
-
-            List<Long> playersIds = playerGames.stream().map(PlayerGame::getPlayerId).collect(Collectors.toList());
-            List<Player> players = playerBusiness.getPlayerByIdIn(playersIds);
-            List<String> playersNicknames = players.stream().map(Player::getNickname).collect(Collectors.toList());
-            gameDTO.setPlayers(playersNicknames);
-
-            List<PlayerKillsByGame> playerKillsByGame = getPlayersKillByGame(game.getId());
-            gameDTO.setKills(playerKillsByGame);
+            GameDTO gameDTO = toGameDto(game);
             gameDtoList.add(gameDTO);
         }
 
         return gameDtoList;
     }
 
-    private List<PlayerKillsByGame> getPlayersKillByGame(Long gameId){
+    public GameDTO getGameSummaryById(Long id){
+
+        Optional<Game> optionalGame = gameRepository.findById(id);
+
+        if(optionalGame.isPresent()){
+            Game game = optionalGame.get();
+            return toGameDto(game);
+        }
+
+        return null;
+    }
+
+    private GameDTO toGameDto(Game game){
+
+        GameDTO gameDTO = new GameDTO();
+        gameDTO.setTotal_kills(game.getTotalKills());
+
+        List<PlayerGame> playerGames = playerGameBusiness.findByGameId(game.getId());
+
+        List<Long> playersIds = playerGames.stream().map(PlayerGame::getPlayerId).collect(Collectors.toList());
+        List<Player> players = playerBusiness.getPlayerByIdIn(playersIds);
+        List<String> playersNicknames = players.stream().map(Player::getNickname).collect(Collectors.toList());
+        gameDTO.setPlayers(playersNicknames);
+
+        List<PlayerKillsByGame> playerKillsByGame = getPlayersKillByGame(game.getId());
+        gameDTO.setKills(playerKillsByGame);
+
+        return gameDTO;
+    }
+
+    public List<PlayerKillsByGame> getPlayersKillByGame(Long gameId){
         return gameRepository.findPlayersKillByGame(gameId);
     }
 
