@@ -23,7 +23,7 @@ import java.util.List;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-class FileBusinessTest {
+class FileBusinessUnitTest {
     
     @Autowired
     FileBusiness fileBusiness;
