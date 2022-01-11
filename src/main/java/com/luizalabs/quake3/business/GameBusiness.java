@@ -82,7 +82,7 @@ public class GameBusiness {
 
     }
 
-    public List<GameDTO> getGamesResume(){
+    public List<GameDTO> getGamesSummary(){
 
         List<GameDTO> gameDtoList = new ArrayList<>();
         List<Game> gameList = gameRepository.findAll();

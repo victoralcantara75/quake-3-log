@@ -1,16 +1,12 @@
 package com.luizalabs.quake3.controller;
 
 import com.luizalabs.quake3.DTO.GameDTO;
-import com.luizalabs.quake3.business.FileBusiness;
 import com.luizalabs.quake3.business.GameBusiness;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,7 +23,7 @@ public class GameController {
     @GetMapping(value = "")
     public ResponseEntity<?> getGames(){
         try{
-            List<GameDTO> gameDTOList = gameBusiness.getGamesResume();
+            List<GameDTO> gameDTOList = gameBusiness.getGamesSummary();
             return new ResponseEntity<>(gameDTOList, HttpStatus.OK);
         }
         catch (Exception ex){
